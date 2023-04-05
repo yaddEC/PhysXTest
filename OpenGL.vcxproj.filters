@@ -111,12 +111,6 @@
     <ClCompile Include="Sources\MonoBehaviour.cpp">
       <Filter>Fichiers sources\LowRenderer</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Collider.cpp">
-      <Filter>Fichiers sources\Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\Collision.cpp">
-      <Filter>Fichiers sources\Physics</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\DevCamera.cpp">
       <Filter>Fichiers sources\LowRenderer</Filter>
     </ClCompile>
@@ -158,6 +152,12 @@
     </ClCompile>
     <ClCompile Include="Sources\RotatingLight.cpp">
       <Filter>Fichiers sources\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Collider.cpp">
+      <Filter>Fichiers sources\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\PhysXManager.cpp">
+      <Filter>Fichiers sources\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -218,12 +218,6 @@
     <ClInclude Include="Headers\Graph.h">
       <Filter>Fichiers d%27en-tête\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\Collider.h">
-      <Filter>Fichiers d%27en-tête\Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\Collision.h">
-      <Filter>Fichiers d%27en-tête\Physics</Filter>
-    </ClInclude>
     <ClInclude Include="Headers\DevCamera.h">
       <Filter>Fichiers d%27en-tête\LowRenderer</Filter>
     </ClInclude>
@@ -265,6 +259,12 @@
     </ClInclude>
     <ClInclude Include="Headers\RotatingLight.h">
       <Filter>Fichiers d%27en-tête\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Collider.h">
+      <Filter>Fichiers d%27en-tête\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\PhysXManager.h">
+      <Filter>Fichiers d%27en-tête\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

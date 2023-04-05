@@ -23,7 +23,7 @@ namespace Core
 		std::string name;
 		bool active = true;
 		Layer layer = Layer::DEFAULT;
-		std::vector<MonoBehaviour*> components;
+		std::vector<MonoBehaviour*> components;//Where my Colliders/RigidBody will be, it will loop and call their updates
 		Transform transform;
 		Matrix4 MVP;
 		Graph* node;

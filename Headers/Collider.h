@@ -2,6 +2,7 @@
 #include "MyMaths.h"
 #include "GameObject.h"
 #include "MonoBehaviour.h"
+#include <PhysXManager.h>
 #include "Rigidbody.h"
 #include <vector>
 
@@ -15,16 +16,21 @@ namespace Physics
 	public:
 		virtual Vector3 FindFurthestPoint(Vector3 direction) = 0;
 		virtual void ShowCollider(int program) = 0;
+		virtual void setShape(PxMaterial& material) = 0;
 
 		bool show = false;
 		bool isTrigger = false;
 		bool collide = false;
 		Vector3 center;
 		Rigidbody* rb;
+		PxShape* shape;
 
-		void Init();
+		void Init(PxPhysics& physics, PxMaterial& material, PxScene& scene);
+
 		void Update() override;
 		void Delete() override;
+
+		
 
 	};
 
@@ -35,8 +41,10 @@ namespace Physics
 		bool UpdateComponent(std::string* id) override;
 		Vector3 FindFurthestPoint(Vector3 direction) override;
 		void ShowCollider(int program) override;
+		void setShape(PxMaterial& material) override;
 		Vector3 size;
 		std::vector<Vector3> vertices;
+		PxBoxGeometry geometry;
 	};
 
 	class SphereCollider : public Collider
@@ -46,8 +54,10 @@ namespace Physics
 		bool UpdateComponent(std::string* id) override;
 		Vector3 FindFurthestPoint(Vector3 direction) override;
 		void ShowCollider(int program) override;
+		void setShape(PxMaterial& material) override;
 		float radius;
 		float scaledRadius;
+		PxSphereGeometry geometry;
 	};
 
 	class CapsuleCollider : public Collider
@@ -57,6 +67,7 @@ namespace Physics
 		bool UpdateComponent(std::string* id) override;
 		Vector3 FindFurthestPoint(Vector3 direction) override;
 		void ShowCollider(int program) override;
+		void setShape(PxMaterial& material) override;
 		float radius;
 		float height;
 
@@ -66,5 +77,6 @@ namespace Physics
 
 		void InitCapsule();
 		std::vector<Vector3> vertices;
+		PxCapsuleGeometry geometry;
 	};
 }

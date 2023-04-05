@@ -11,9 +11,9 @@
 #include "ResourceManager.h"
 #include "Graph.h"
 #include "Collider.h"
-#include "Collision.h"
 #include "Camera.h"
 #include "AppState.h"
+#include "PhysXManager.h"
 
 #include "PlayerMovements.h"
 #include "HeadRotation.h"
@@ -56,6 +56,7 @@ namespace Resources
 		~Scene() 
 		{
 			ResourceManager::DeleteMap();
+			mPhysXManager.Cleanup();
 		};
 
 		void Init(int generatePlatformer);
@@ -112,7 +113,7 @@ namespace Resources
 		void AddSpotLight(GameObject* object, float angle = 12.0f, Vector3 color = Vector3(1, 1, 1));
 		void AddCamera(GameObject* object);
 		template <class T>
-		void AddCollider(GameObject* object, Vector3 center = Vector3(), Vector3 size = Vector3(1, 1, 1), bool trigger = false);
+		void AddCollider(GameObject* object, PxMaterial& material, Vector3 center = Vector3(), Vector3 size = Vector3(1, 1, 1),bool trigger = false, bool isStatic = true);
 		template <class T>
 		void AddScript(GameObject* object);
 		void AddRigidbody(GameObject* object);
@@ -122,6 +123,8 @@ namespace Resources
 		void SetButtonInOptionImgui(std::string name, Input::Button moveChange);
 		
 	private:
+		PhysXManager mPhysXManager;
+		PxMaterial* rockMaterial;
 		GameObject* selectedObject = nullptr;
 
 		StateMenu stateMenu = StateMenu::MAINMENU;

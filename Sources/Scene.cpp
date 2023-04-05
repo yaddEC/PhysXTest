@@ -19,6 +19,11 @@ namespace Resources {
 	//-------------------------------------------------------------------------------------------------------------------------------------
 	void Scene::Init(int generatePlatformer)
 	{
+
+		mPhysXManager.Init();
+		PxPhysics* physics = mPhysXManager.getPhysics();
+		rockMaterial = mPhysXManager.createMaterialByType(physics, ROCK);
+
 		idScene = generatePlatformer;
 		camera.Init(AppState::windowWidth, AppState::windowHeight);
 
@@ -69,16 +74,17 @@ namespace Resources {
 	void Scene::GeneratePlatformerScene()
 	{
 		AddSkybox("cube");
+		
 
 		// PLAYER
 
-		AddEmptyObject("Player", Transform(Vector3(0, 1, 0), Vector3(0, 90, 0)));
+		AddEmptyObject("Player", Transform(Vector3(70, 50, 0), Vector3(0, 90, 0)));
 		Graph* playerNode = gameObjects.back().node;
 		AddRigidbody(playerNode->object);
 		gameObjects.back().layer = Layer::PLAYER;
 
-		AddCollider<SphereCollider>(playerNode->object, Vector3(), Vector3(0.52, NULL, NULL));
-		AddCollider<BoxCollider>(playerNode->object, Vector3(0, -0.5, 0), Vector3(0.4, 0.15, 0.4), true);
+		AddCollider<SphereCollider>(playerNode->object, *rockMaterial, Vector3(), Vector3(0.52, NULL, NULL),false,false);
+		AddCollider<BoxCollider>(playerNode->object, *rockMaterial, Vector3(0, -0.5, 0), Vector3(0.4, 0.15, 0.4), true,false);
 		AddScript<PlayerMovements>(playerNode->object);
 
 		AddEmptyObject("Head", playerNode, Transform());
@@ -109,31 +115,55 @@ namespace Resources {
 		AddEmptyObject("Platforms", &sceneGraph.back());
 		Graph* platformsNode = gameObjects.back().node;
 		AddModelObject("cube", "cubeTexture", "mainShader", platformsNode, Transform(Vector3(0, -3, 0), Vector3(), Vector3(10, 2, 10)));
-		AddCollider<BoxCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
+
 		AddModelObject("cube", "cubeTexture", "mainShader", platformsNode, Transform(Vector3(12, -3, 0), Vector3(), Vector3(5, 2, 5)));
-		AddCollider<BoxCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
+
 		AddModelObject("cube", "cubeTexture", "mainShader", platformsNode, Transform(Vector3(17, -1, 0), Vector3(), Vector3(5, 2, 5)));
-		AddCollider<BoxCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
+
 		AddModelObject("cube", "cubeTexture", "mainShader", platformsNode, Transform(Vector3(24, -1, 0), Vector3(30, 0, 0), Vector3(5, 2, 5)));
-		AddCollider<BoxCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
+
 		AddModelObject("cube", "cubeTexture", "mainShader", platformsNode, Transform(Vector3(31, -1, 0), Vector3(-30, 0, 0), Vector3(5, 2, 5)));
-		AddCollider<BoxCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
+
 		AddModelObject("mySphere", "cubeTexture", "mainShader", platformsNode, Transform(Vector3(38, -1, 0), Vector3(), Vector3(2, 2, 2)));
-		AddCollider<SphereCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<SphereCollider>(&gameObjects.back(), *rockMaterial);
+
 		AddModelObject("cube", "cubeTexture", "mainShader", platformsNode, Transform(Vector3(48, -1, 0), Vector3(0, 0, 30), Vector3(12, 2, 2)));
-		AddCollider<BoxCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
+
 		AddModelObject("burger", "burgerTexture", "mainShader", &sceneGraph.back(), Transform(Vector3(60, -5, 0), Vector3(0, 0, 0), Vector3(0.8, 0.8, 0.8)));
-		AddCollider<BoxCollider>(&gameObjects.back(), Vector3(0, 2, 0), Vector3(4, 5, 4));
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial, Vector3(0, 2, 0), Vector3(4, 5, 4));
+
 		AddModelObject("cube", "cubeTexture", "mainShader", platformsNode, Transform(Vector3(68, -3, 0), Vector3(), Vector3(5, 2, 5)));
-		AddCollider<BoxCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
+
 		AddModelObject("cube", "cubeTexture", "mainShader", platformsNode, Transform(Vector3(80, -3, 0), Vector3(), Vector3(10, 2, 10)));
-		AddCollider<BoxCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
+
 		AddModelObject("chest", "chestTexture", "mainShader", &sceneGraph.back(), Transform(Vector3(83, -2, 0), Vector3(0, -70, 0), Vector3(0.8, 0.8, 0.8)));
+		
 		AddEmptyObject("collider", gameObjects.back().node, Transform(Vector3(), Vector3(0, -20, 0)));
-		AddCollider<BoxCollider>(&gameObjects.back(), Vector3(0.1, 1.25, 0.1), Vector3(3, 2.5, 2.5));
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial, Vector3(0.1, 1.25, 0.1), Vector3(3, 2.5, 2.5));
+
 		AddModelObject("goomba", "goombaTexture", "mainShader", &sceneGraph.back(), Transform(Vector3(4, -2, 0), Vector3(0, -90, 0), Vector3(0.03, 0.03, 0.03)));
 		gameObjects.back().layer = Layer::ENEMY;
-		AddCollider<BoxCollider>(&gameObjects.back(), Vector3(0, 40, 0), Vector3(50, 80, 50));
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial, Vector3(0, 40, 0), Vector3(50, 80, 50));
 		AddScript<Enemy>(&gameObjects.back());
 		Enemy* enemy = (Enemy*)gameObjects.back().components.back();
 		enemy->AddPathPoint(Vector3(4, -2, -2));
@@ -141,7 +171,8 @@ namespace Resources {
 
 		AddModelObject("goomba", "goombaTexture", "mainShader", &sceneGraph.back(), Transform(Vector3(15.25, 0, 1.75), Vector3(0, -90, 0), Vector3(0.03, 0.03, 0.03)));
 		gameObjects.back().layer = Layer::ENEMY;
-		AddCollider<BoxCollider>(&gameObjects.back(), Vector3(0, 40, 0), Vector3(50, 80, 50));
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial, Vector3(0, 40, 0), Vector3(50, 80, 50));
 		AddScript<Enemy>(&gameObjects.back());
 		enemy = (Enemy*)gameObjects.back().components.back();
 		enemy->AddPathPoint(Vector3(15.25, 0, -1.75));
@@ -151,7 +182,8 @@ namespace Resources {
 
 		AddModelObject("goomba", "goombaTexture", "mainShader", &sceneGraph.back(), Transform(Vector3(75.75, -2, 0), Vector3(0, -90, 0), Vector3(0.03, 0.03, 0.03)));
 		gameObjects.back().layer = Layer::ENEMY;
-		AddCollider<BoxCollider>(&gameObjects.back(), Vector3(0, 40, 0), Vector3(50, 80, 50));
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial, Vector3(0, 40, 0), Vector3(50, 80, 50));
 		AddScript<Enemy>(&gameObjects.back());
 		enemy = (Enemy*)gameObjects.back().components.back();
 		enemy->AddPathPoint(Vector3(75.75, -2, 2));
@@ -164,17 +196,25 @@ namespace Resources {
 		AddModelObject("myCapsule", "cubeTexture", "mainShader", &sceneGraph.back(), Transform(Vector3(3.5, 0.5, 3), Vector3(90, 0, 0), Vector3(0.5, 0.5, 0.5)));
 		//AddCollider<CapsuleCollider>(&gameObjects.back());
 		AddModelObject("cube", "cubeTexture", "mainShader", &sceneGraph.back(), Transform(Vector3(-3.5, -1, -3.5), Vector3(45, 45, 45), Vector3(1, 1, 1)));
-		AddCollider<BoxCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
+
 		AddModelObject("cube", "cubeTexture", "mainShader", &sceneGraph.back(), Transform(Vector3(81, -1, 5.5), Vector3(0, 0, 0), Vector3(10, 2.5, 1)));
-		AddCollider<BoxCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
+
 		AddModelObject("cube", "cubeTexture", "mainShader", &sceneGraph.back(), Transform(Vector3(81, -1, -5.5), Vector3(0, 0, 0), Vector3(10, 2.5, 1)));
-		AddCollider<BoxCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
+
 		AddModelObject("cube", "cubeTexture", "mainShader", &sceneGraph.back(), Transform(Vector3(85.5, -1, 0), Vector3(0, 0, 0), Vector3(1, 2.5, 10)));
-		AddCollider<BoxCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
 
 		AddModelObject("cube", "skyBox", "reflectionShader", &sceneGraph.back(), Transform(Vector3(0, 0.5, -3), Vector3(0, 0, 0), Vector3(1.5, 1.5, 1.5)), Type::REFLECTION);
 		//AddModelObject("cube", "cubeTexture", "blinnPhongShader", reflectionNode, Transform(Vector3(0, 0, -3), Vector3(), Vector3(1, 1, 1)), Type::NORMAL);
-		AddCollider<BoxCollider>(&gameObjects.back());
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
 
 	}
 
@@ -217,6 +257,8 @@ namespace Resources {
 
 	void Scene::Update(SceneManager& sceneManager)
 	{
+
+
 		if (!ResourceManager::GetInstance().timerPrinted && ResourceManager::CheckLoading())
 		{
 			ResourceManager::GetInstance().loadingTime = std::chrono::duration_cast<chrono::milliseconds>(std::chrono::high_resolution_clock::now() - ResourceManager::GetInstance().beginTime).count();
@@ -317,7 +359,7 @@ namespace Resources {
 				camera.Update();
 				Renderer::currentViewPos = &camera.position;
 				UpdateGameObjects(sceneGraph);
-				Collision::UpdateCollisions();
+				mPhysXManager.Update(Core::AppState::deltatime);
 				Renderer::RenderColliders();
 			}
 
@@ -345,7 +387,7 @@ namespace Resources {
 				Renderer::currentViewPos = &pos;
 				Renderer::RenderCubeMap(currentCubeMap);
 				UpdateGameObjects(sceneGraph);
-				Collision::UpdateCollisions();
+				mPhysXManager.Update(Core::AppState::deltatime);
 				if (Input::showColliders)
 					Renderer::RenderColliders();
 
@@ -400,6 +442,7 @@ namespace Resources {
 					}
 					gameObjects.clear();
 					sceneGraph.clear();
+					mPhysXManager.Cleanup();
 					gameCamera = nullptr;
 					ResetID();
 					ResourceManager::GetInstance().everythingLoaded = false;
@@ -646,13 +689,23 @@ namespace Resources {
 				if (ImGui::BeginMenu("Collider"))
 				{
 					if (ImGui::MenuItem("Box"))
-						AddCollider<BoxCollider>(selectedObject);
+					{
+						AddRigidbody(selectedObject);
+						AddCollider<BoxCollider>(selectedObject, *rockMaterial);
+
+					}
 
 					if (ImGui::MenuItem("Sphere"))
-						AddCollider<SphereCollider>(selectedObject);
+					{
+						AddRigidbody(selectedObject);
+						AddCollider<SphereCollider>(selectedObject, *rockMaterial);
+					}
 
 					if (ImGui::MenuItem("Capsule"))
-						AddCollider<CapsuleCollider>(selectedObject);
+					{
+						AddRigidbody(selectedObject);
+						AddCollider<CapsuleCollider>(selectedObject, *rockMaterial);
+					}
 
 
 					ImGui::EndMenu();
@@ -682,12 +735,14 @@ namespace Resources {
 			if (ImGui::Selectable("Cube"))
 			{
 				AddModelObject("cube", "cubeTexture", "mainShader");
-				AddCollider<BoxCollider>(&gameObjects.back());
+				AddRigidbody(&gameObjects.back());
+				AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial);
 			}
 			if (ImGui::Selectable("Sphere"))
 			{
 				AddModelObject("mySphere", "cubeTexture", "mainShader");
-				AddCollider<SphereCollider>(&gameObjects.back());
+				AddRigidbody(&gameObjects.back());
+				AddCollider<SphereCollider>(&gameObjects.back(), *rockMaterial);
 			}
 			ImGui::EndPopup();
 		}
@@ -999,33 +1054,39 @@ namespace Resources {
 	}
 
 	template <class T>
-	void Scene::AddCollider(GameObject* object, Vector3 center, Vector3 size, bool trigger)
+	void Scene::AddCollider(GameObject* object, PxMaterial& material, Vector3 center, Vector3 size, bool trigger, bool isStatic)
 	{
+		PxPhysics* physics = mPhysXManager.getPhysics();
+		PxScene* scene = mPhysXManager.getScene();
 		if (typeid(T) == typeid(BoxCollider))
 		{
 			T* collider = new T();
 			BoxCollider* box = (BoxCollider*)collider;
 			box->gameObject = object;
-			box->Init();
 			box->center = center;
 			box->size = size;
 			box->isTrigger = trigger;
+			object->GetComponent<Rigidbody>()->isStatic = isStatic;
+			box->geometry = PxBoxGeometry(object->transform.scale.x * size.x*0.5f, object->transform.scale.y * size.y * 0.5f, object->transform.scale.z * size.z * 0.5f);
+			box->Init(*physics,material,*scene);
 			MonoBehaviour* component = (MonoBehaviour*)box;
 			object->components.push_back(component);
-			Collision::currentColliders.push_back((Collider*)component);
+			/*Collision::currentColliders.push_back((Collider*)component);*/
 		}
 		else if (typeid(T) == typeid(SphereCollider))
 		{
 			T* collider = new T();
 			SphereCollider* sphere = (SphereCollider*)collider;
 			sphere->gameObject = object;
-			sphere->Init();
 			sphere->center = center;
 			sphere->radius = size.x;
+			sphere->geometry = PxSphereGeometry(object->transform.scale.x * size.x);
 			sphere->isTrigger = trigger;
+			object->GetComponent<Rigidbody>()->isStatic = isStatic;
+			sphere->Init(*physics, material,*scene);
 			MonoBehaviour* component = (MonoBehaviour*)sphere;
 			object->components.push_back(component);
-			Collision::currentColliders.push_back((Collider*)component);
+			/*Collision::currentColliders.push_back((Collider*)component);*/
 		}
 		else if (typeid(T) == typeid(CapsuleCollider))
 		{
@@ -1033,14 +1094,16 @@ namespace Resources {
 			CapsuleCollider* capsule = (CapsuleCollider*)collider;
 			capsule->gameObject = object;
 			//capsule->InitCapsule();
-			capsule->Init();
 			capsule->center = center;
 			capsule->radius = size.x;
 			capsule->height = size.y;
 			capsule->isTrigger = trigger;
+			object->GetComponent<Rigidbody>()->isStatic = isStatic;
+			capsule->geometry = PxCapsuleGeometry(object->transform.scale.x * size.x, object->transform.scale.y * size.y * 0.5f);
+			capsule->Init(*physics, material,*scene);
 			MonoBehaviour* component = (MonoBehaviour*)capsule;
 			object->components.push_back(component);
-			Collision::currentColliders.push_back((Collider*)component);
+			/*Collision::currentColliders.push_back((Collider*)component);*/
 		}
 	}
 

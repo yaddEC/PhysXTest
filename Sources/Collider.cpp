@@ -1,14 +1,26 @@
 #include <glad/glad.h>
 #include "Collider.h"
-#include "Collision.h"
 #include "ResourceManager.h"
 #include "Renderer.h"
 
-void Physics::Collider::Init()
+void Physics::Collider::Init(PxPhysics& physics, PxMaterial& material, PxScene& scene)
 {
 	Rigidbody* rigidbody = gameObject->GetComponent<Rigidbody>();
 	if (rigidbody)
 		rb = rigidbody;
+
+	PxTransform pose(PxVec3(gameObject->transform.position.x, gameObject->transform.position.y, gameObject->transform.position.z));
+
+	if (rb->isStatic) {
+		rb->PhysxActor = physics.createRigidStatic(pose);
+	}
+	else {
+		rb->PhysxActor = physics.createRigidDynamic(pose);
+		rb->PhysxActor->is<PxRigidDynamic>()->setMass(rb->mass);
+	}
+	setShape(material);
+
+	scene.addActor(*rb->PhysxActor);
 }
 
 void Physics::Collider::Update()
@@ -22,23 +34,14 @@ void Physics::Collider::Update()
 
 void Physics::Collider::Delete()
 {
-	std::vector<Collider*>::iterator it = Collision::currentColliders.begin();
-	for (Collider* collider : Collision::currentColliders)
-	{
-		if (collider == this)
-		{
-			Collision::currentColliders.erase(it);
-			return;
-		}
-		it++;
-	}
+	
 }
 
 Physics::BoxCollider::BoxCollider(Vector3 _size)
 {
 	size = _size;
 	Vector3 seg = size / 2.0f;
-
+	geometry = PxBoxGeometry(seg.x, seg.y, seg.z);
 	vertices.push_back(Vector3(-seg.x, -seg.y, seg.z));
 	vertices.push_back(Vector3(seg.x, -seg.y, seg.z));
 	vertices.push_back(Vector3(seg.x, seg.y, seg.z));
@@ -63,6 +66,13 @@ void Physics::BoxCollider::ShowCollider(int program)
 	glBindVertexArray(ResourceManager::Get<Model>("myCube")->GetVAO());
 	glDrawElements(GL_TRIANGLES, ResourceManager::Get<Model>("myCube")->indexBuffer.size(), GL_UNSIGNED_INT, 0);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+void Physics::BoxCollider::setShape(PxMaterial& material)
+{
+	shape = PxRigidActorExt::createExclusiveShape(*rb->PhysxActor, geometry, material);
+	if(isTrigger)
+		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
 }
 
 bool Physics::BoxCollider::UpdateComponent(std::string* id)
@@ -115,6 +125,7 @@ Vector3 Physics::BoxCollider::FindFurthestPoint(Vector3 direction)
 Physics::SphereCollider::SphereCollider(float _radius)
 {
 	radius = _radius;
+	geometry = PxSphereGeometry(_radius);
 }
 
 void Physics::SphereCollider::ShowCollider(int program)
@@ -144,6 +155,13 @@ void Physics::SphereCollider::ShowCollider(int program)
 	glBindVertexArray(ResourceManager::Get<Model>("mySphere")->GetVAO());
 	glDrawElements(GL_TRIANGLES, ResourceManager::Get<Model>("mySphere")->indexBuffer.size(), GL_UNSIGNED_INT, 0);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+void Physics::SphereCollider::setShape(PxMaterial& material)
+{
+	shape = PxRigidActorExt::createExclusiveShape(*rb->PhysxActor, geometry, material);
+	if (isTrigger)
+		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
 }
 
 bool Physics::SphereCollider::UpdateComponent(std::string* id)
@@ -200,6 +218,7 @@ Physics::CapsuleCollider::CapsuleCollider(float _radius, float _height)
 {
 	radius = _radius;
 	height = _height;
+	geometry = PxCapsuleGeometry(_radius, _height *0.5f);
 	InitCapsule();
 }
 
@@ -228,6 +247,13 @@ void Physics::CapsuleCollider::ShowCollider(int program)
 	glBindVertexArray(ResourceManager::Get<Model>("myCapsule")->GetVAO());
 	glDrawElements(GL_TRIANGLES, ResourceManager::Get<Model>("myCapsule")->indexBuffer.size(), GL_UNSIGNED_INT, 0);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+void Physics::CapsuleCollider::setShape(PxMaterial& material)
+{
+	shape = PxRigidActorExt::createExclusiveShape(*rb->PhysxActor, geometry, material);
+	if (isTrigger)
+		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
 }
 
 bool Physics::CapsuleCollider::UpdateComponent(std::string* id)

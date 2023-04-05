@@ -126,7 +126,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;LowLevelAABB_static_64.lib;PhysXPvdSDK_static_64.lib;LowLevelDynamics_static_64.lib;PhysXTask_static_64.lib;LowLevel_static_64.lib;PhysXVehicle_static_64.lib;PhysXCharacterKinematic_static_64.lib;PhysX_64.lib;PhysXCommon_64.lib;SceneQuery_static_64.lib;PhysXCooking_64.lib;SimulationController_static_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,9 +152,8 @@
     <ClCompile Include="Sources\App.cpp" />
     <ClCompile Include="Sources\AppState.cpp" />
     <ClCompile Include="Sources\Camera.cpp" />
-    <ClCompile Include="Sources\DevCamera.cpp" />
     <ClCompile Include="Sources\Collider.cpp" />
-    <ClCompile Include="Sources\Collision.cpp" />
+    <ClCompile Include="Sources\DevCamera.cpp" />
     <ClCompile Include="Sources\Enemy.cpp" />
     <ClCompile Include="Sources\GameObject.cpp" />
     <ClCompile Include="Sources\glad.c" />
@@ -175,6 +174,7 @@
     <ClCompile Include="Sources\Mesh.cpp" />
     <ClCompile Include="Sources\MonoBehaviour.cpp" />
     <ClCompile Include="Sources\MyMaths.cpp" />
+    <ClCompile Include="Sources\PhysXManager.cpp" />
     <ClCompile Include="Sources\PlayerMovements.cpp" />
     <ClCompile Include="Sources\Renderer.cpp" />
     <ClCompile Include="Sources\Rigidbody.cpp" />
@@ -188,9 +188,8 @@
     <ClInclude Include="Headers\App.h" />
     <ClInclude Include="Headers\AppState.h" />
     <ClInclude Include="Headers\Camera.h" />
-    <ClInclude Include="Headers\DevCamera.h" />
     <ClInclude Include="Headers\Collider.h" />
-    <ClInclude Include="Headers\Collision.h" />
+    <ClInclude Include="Headers\DevCamera.h" />
     <ClInclude Include="Headers\Debug.h" />
     <ClInclude Include="Headers\Enemy.h" />
     <ClInclude Include="Headers\GameObject.h" />
@@ -211,6 +210,7 @@
     <ClInclude Include="Headers\Mesh.h" />
     <ClInclude Include="Headers\MonoBehaviour.h" />
     <ClInclude Include="Headers\MyMaths.h" />
+    <ClInclude Include="Headers\PhysXManager.h" />
     <ClInclude Include="Headers\PlayerMovements.h" />
     <ClInclude Include="Headers\Renderer.h" />
     <ClInclude Include="Headers\ResourceManager.h" />

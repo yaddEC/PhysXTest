@@ -1,6 +1,7 @@
 #pragma once
 #include "MyMaths.h"
 #include "MonoBehaviour.h"
+#include <PhysXManager.h>
 
 using namespace Core::Maths;
 using namespace LowRenderer;
@@ -19,6 +20,11 @@ namespace Physics
 
 		Vector3 gravity = Vector3(0, -20, 0);
 		Vector3 velocity;
+		bool isStatic = false;
+		float mass = 1;
 		bool reset = false;
+
+		PxRigidActor* PhysxActor;
+		
 	};
 }

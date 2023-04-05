@@ -131,11 +131,11 @@ void LowRenderer::Renderer::RenderColliders()
 	int program = ResourceManager::Get<Shader>("colliderShader")->GetProgram();
 	glUseProgram(program);
 
-	for (Collider* c : Collision::currentColliders) 
+	/*for (Collider* c : Collision::currentColliders)
 	{
 		if (c->show && c->IsActive(true))
 			c->ShowCollider(program);
-	}
+	}*/
 }
 
 
