@@ -80,12 +80,14 @@ namespace Resources {
 
 		AddEmptyObject("Player", Transform(Vector3(70, 50, 0), Vector3(0, 90, 0)));
 		Graph* playerNode = gameObjects.back().node;
-		AddRigidbody(playerNode->object);
 		gameObjects.back().layer = Layer::PLAYER;
-
+		AddRigidbody(playerNode->object);
 		AddCollider<SphereCollider>(playerNode->object, *rockMaterial, Vector3(), Vector3(0.52, NULL, NULL),false,false);
-		AddCollider<BoxCollider>(playerNode->object, *rockMaterial, Vector3(0, -0.5, 0), Vector3(0.4, 0.15, 0.4), true,false);
-		AddScript<PlayerMovements>(playerNode->object);
+
+
+
+
+		
 
 		AddEmptyObject("Head", playerNode, Transform());
 		AddScript<HeadRotation>(&gameObjects.back());
@@ -94,6 +96,13 @@ namespace Resources {
 		AddCamera(&gameObjects.back());
 
 		AddModelObject("boo", "booTexture", "mainShader", playerNode, Transform(Vector3(0, -0.52, -0.055), Vector3(), Vector3(0.012, 0.012, 0.012)));
+
+		Graph* boo = gameObjects.back().node;
+		AddModelObject("cube", "cubeTexture", "mainShader", boo, Transform(Vector3(0, -0.5, 0), Vector3(), Vector3(100, 50, 100)));
+		AddRigidbody(&gameObjects.back());
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial, Vector3(0, -0.5, 0), Vector3(100, 50, 100), true,true);
+
+		AddScript<PlayerMovements>(playerNode->object);
 
 		AddEmptyObject("Lights");
 		Graph* lightNode = &sceneGraph.back();

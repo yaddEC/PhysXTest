@@ -9,7 +9,7 @@ void Physics::Collider::Init(PxPhysics& physics, PxMaterial& material, PxScene& 
 	if (rigidbody)
 		rb = rigidbody;
 
-	PxTransform pose(PxVec3(gameObject->transform.position.x, gameObject->transform.position.y, gameObject->transform.position.z));
+	PxTransform pose(PxVec3(gameObject->transform.position.x+center.x, gameObject->transform.position.y+center.y, gameObject->transform.position.z+center.z));
 
 	if (rb->isStatic) {
 		rb->PhysxActor = physics.createRigidStatic(pose);
@@ -71,8 +71,11 @@ void Physics::BoxCollider::ShowCollider(int program)
 void Physics::BoxCollider::setShape(PxMaterial& material)
 {
 	shape = PxRigidActorExt::createExclusiveShape(*rb->PhysxActor, geometry, material);
-	if(isTrigger)
+	if (isTrigger)
+	{
+		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
 		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+	}
 }
 
 bool Physics::BoxCollider::UpdateComponent(std::string* id)
@@ -161,7 +164,11 @@ void Physics::SphereCollider::setShape(PxMaterial& material)
 {
 	shape = PxRigidActorExt::createExclusiveShape(*rb->PhysxActor, geometry, material);
 	if (isTrigger)
+	{
+		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
 		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+	}
+
 }
 
 bool Physics::SphereCollider::UpdateComponent(std::string* id)
@@ -181,7 +188,7 @@ bool Physics::SphereCollider::UpdateComponent(std::string* id)
 		ImGui::Checkbox(("Is Trigger##" + *id).c_str(), &isTrigger);
 		ImGui::Dummy(ImVec2(10, 10));
 		ImGui::Text("\Cnenter");
-		ImGui::DragFloat3(("##center" + *id).c_str(), &center.x , 0.1, -100, 100);
+		ImGui::DragFloat3(("##center" + *id).c_str(), &center.x, 0.1, -100, 100);
 		ImGui::Text("\nRadius");
 		ImGui::DragFloat(("##radius" + *id).c_str(), &radius, 0.01, 0.001, 100);
 	}
@@ -253,7 +260,10 @@ void Physics::CapsuleCollider::setShape(PxMaterial& material)
 {
 	shape = PxRigidActorExt::createExclusiveShape(*rb->PhysxActor, geometry, material);
 	if (isTrigger)
+	{
+		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
 		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+	}
 }
 
 bool Physics::CapsuleCollider::UpdateComponent(std::string* id)

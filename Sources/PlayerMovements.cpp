@@ -8,7 +8,8 @@ using namespace Core;
 void Game::PlayerMovements::Init()
 {
 	rb = gameObject->GetComponent<Rigidbody>();
-	groundCheck = gameObject->GetComponent<BoxCollider>();
+	
+	groundCheck =gameObject->node->children.back().object->GetComponent<BoxCollider>();
 }
 
 void PlayerMovements::UpdateScript()
@@ -16,11 +17,11 @@ void PlayerMovements::UpdateScript()
 	UpdateRotation();
 	UpdateMovements();
 
-	if (groundCheck->collide) // Check if grounded
+	/*if (groundCheck->collide) // Check if grounded
 		grounded = true;
 	else
 		grounded = false;
-
+		*/
 	if (gameObject->transform.position.y < -20) // Respawn
 	{
 		ResetPos();
