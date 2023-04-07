@@ -87,8 +87,6 @@ namespace Resources {
 
 
 
-		
-
 		AddEmptyObject("Head", playerNode, Transform());
 		AddScript<HeadRotation>(&gameObjects.back());
 

@@ -57,6 +57,7 @@ private:
     PxPhysics* mPhysics;
     PxScene* mScene;
     PxPvd* mPvd;
+    MySimulationEventCallback* mySimulationEventCallback;
 
     void CreateFoundation();
     void CreatePhysics();

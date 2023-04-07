@@ -13,12 +13,24 @@ MySimulationEventCallback::~MySimulationEventCallback()
 {
 }
 
+PxFilterFlags CustomFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
+    PxFilterObjectAttributes attributes1, PxFilterData filterData1,
+    PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
+{
+    pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+    pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
+    pairFlags |= PxPairFlag::eNOTIFY_TOUCH_LOST;
+    return PxFilterFlag::eDEFAULT;
+}
+
 void MySimulationEventCallback::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
 {
 
     for (PxU32 i = 0; i < nbPairs; i++)
     {
         const PxContactPair& cp = pairs[i];
+
+        printf("STAY COLLISION\n");
 
         // only interested in contacts found with the shapes of the collider
         if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
@@ -30,11 +42,12 @@ void MySimulationEventCallback::onContact(const PxContactPairHeader& pairHeader,
         // only interested in contacts lost with the shapes of the collider
         if (cp.events & PxPairFlag::eNOTIFY_TOUCH_LOST)
         {
-            //  printf("EXIT\n");
+            printf("EXIT COLLISION\n");
 
         }
 
-        //  printf("STAY\n");
+
+       
 
     }
 }
@@ -59,6 +72,7 @@ void MySimulationEventCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
         {
              printf("EXIT TRIGGER\n");
         }
+  
 
         printf("STAY TRIGGER\n");
 
@@ -93,6 +107,7 @@ void PhysXManager::Update(float deltaTime)
     {
         mScene->simulate(deltaTime);
         mScene->fetchResults(true);
+        
     }
 }
 
@@ -176,12 +191,19 @@ void PhysXManager::CreatePhysics()
 
 void PhysXManager::CreateScene()
 {
-    MySimulationEventCallback* mySimulationEventCallback = new MySimulationEventCallback();
+    mySimulationEventCallback = new MySimulationEventCallback();
     PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
     sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
     sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
-    sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+    sceneDesc.filterShader = CustomFilterShader;
+    sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
+    sceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
     sceneDesc.simulationEventCallback = mySimulationEventCallback;
+    printf("PxSceneDesc settings:\n");
+    printf("Gravity: (%f, %f, %f)\n", sceneDesc.gravity.x, sceneDesc.gravity.y, sceneDesc.gravity.z);
+    printf("Filter shader: %p\n", sceneDesc.filterShader);
+    printf("Flags: %x\n", sceneDesc.flags);
+    printf("Simulation event callback: %p\n", sceneDesc.simulationEventCallback);
     mScene = mPhysics->createScene(sceneDesc);
     if (!mScene)
         throw std::runtime_error("createScene failed!");
