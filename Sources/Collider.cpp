@@ -8,8 +8,10 @@ void Physics::Collider::Init(PxPhysics& physics, PxMaterial& material, PxScene& 
 	Rigidbody* rigidbody = gameObject->GetComponent<Rigidbody>();
 	if (rigidbody)
 		rb = rigidbody;
-
-	PxTransform pose(PxVec3(gameObject->transform.position.x+center.x, gameObject->transform.position.y+center.y, gameObject->transform.position.z+center.z));
+	Matrix4 worldModel = gameObject->GetWorldModel();
+	PxVec3 positionPointer = PxVec3(worldModel.matrix[0][3] + center.x, worldModel.matrix[1][3] + center.y, worldModel.matrix[2][3] + center.z);
+	
+	PxTransform pose(positionPointer);
 
 	if (rb->isStatic) {
 		rb->PhysxActor = physics.createRigidStatic(pose);
@@ -25,11 +27,11 @@ void Physics::Collider::Init(PxPhysics& physics, PxMaterial& material, PxScene& 
 
 void Physics::Collider::Update()
 {
-	/*int program = ResourceManager::Get<Shader>("colliderShader")->GetProgram();
-	glUseProgram(program);
-
-	if (show && IsActive(true))
-		ShowCollider(program);*/
+	
+	/*Matrix4 worldModel = gameObject->GetWorldModel();
+	PxVec3 position(worldModel.matrix[0][3] + center.x, worldModel.matrix[1][3] + center.y, worldModel.matrix[2][3] + center.z);
+	PxTransform pose(position);
+	rb->PhysxActor->setGlobalPose(pose);*/
 }
 
 void Physics::Collider::Delete()
@@ -71,6 +73,9 @@ void Physics::BoxCollider::ShowCollider(int program)
 void Physics::BoxCollider::setShape(PxMaterial& material)
 {
 	shape = PxRigidActorExt::createExclusiveShape(*rb->PhysxActor, geometry, material);
+
+	
+
 	if (isTrigger)
 	{
 		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);

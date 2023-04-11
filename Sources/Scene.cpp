@@ -96,9 +96,9 @@ namespace Resources {
 		AddModelObject("boo", "booTexture", "mainShader", playerNode, Transform(Vector3(0, -0.52, -0.055), Vector3(), Vector3(0.012, 0.012, 0.012)));
 
 		Graph* boo = gameObjects.back().node;
-		AddModelObject("cube", "cubeTexture", "mainShader", boo, Transform(Vector3(0, -0.5, 0), Vector3(), Vector3(100, 50, 100)));
+		AddModelObject("cube", "cubeTexture", "mainShader", boo, Transform(Vector3(0, -50, 0), Vector3(), Vector3(100, 50, 100)));
 		AddRigidbody(&gameObjects.back());
-		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial, Vector3(0, -0.5, 0), Vector3(100, 50, 100), true,true);
+		AddCollider<BoxCollider>(&gameObjects.back(), *rockMaterial, Vector3(0, 0, 0), Vector3(1, 1, 1),true,true);
 
 		AddScript<PlayerMovements>(playerNode->object);
 
@@ -967,104 +967,108 @@ namespace Resources {
 		}
 	}
 
-	//--------------------------------------------------------------------------------------------------------------------
-	//				ADD COMPONENTS
-	//--------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------
+//				ADD COMPONENTS
+//--------------------------------------------------------------------------------------------------------------------
 
-	void Scene::AddMesh(GameObject* object,  std::string modelName, Type meshType,std::string textureName, std::string shaderName)
-	{
-		Mesh* mesh = new Mesh;
-		mesh->data = ResourceManager::Get<Model>(modelName);
-		mesh->shader = ResourceManager::Get<Shader>(shaderName);
-		mesh->texture = ResourceManager::Get<Texture>(textureName);
-		mesh->meshType = meshType;
-		//mesh->data->SetBuffersAndVAO();
-		MonoBehaviour* component = (MonoBehaviour*)mesh;
+void Scene::AddMesh(GameObject* object, std::string modelName, Type meshType, std::string textureName, std::string shaderName)
+{
+	Mesh* mesh = new Mesh;
+	mesh->data = ResourceManager::Get<Model>(modelName);
+	mesh->shader = ResourceManager::Get<Shader>(shaderName);
+	mesh->texture = ResourceManager::Get<Texture>(textureName);
+	mesh->meshType = meshType;
+	//mesh->data->SetBuffersAndVAO();
+	MonoBehaviour* component = (MonoBehaviour*)mesh;
 
-		component->gameObject = object;
-		object->components.push_back(component);
-	}	
-	
-	Mesh* Scene::AddMesh(std::string modelName, std::string textureName, std::string shaderName)
+	component->gameObject = object;
+	object->components.push_back(component);
+}
+
+Mesh* Scene::AddMesh(std::string modelName, std::string textureName, std::string shaderName)
+{
+	Mesh* mesh = new Mesh;
+	mesh->data = ResourceManager::Get<Model>(modelName);
+	mesh->shader = ResourceManager::Get<Shader>(shaderName);
+	mesh->texture = ResourceManager::Get<Texture>(textureName);
+	return mesh;
+}
+
+void Scene::AddPointLight(GameObject* object, Vector3 color)
+{
+	if (Renderer::currentPointLights.size() >= MAX_POINT_LIGHTS)
 	{
-		Mesh* mesh = new Mesh;
-		mesh->data = ResourceManager::Get<Model>(modelName);
-		mesh->shader = ResourceManager::Get<Shader>(shaderName);
-		mesh->texture = ResourceManager::Get<Texture>(textureName);
-		return mesh;
+		DEBUG_LOG("Max lights number (%i) reached. New light not added.", MAX_POINT_LIGHTS);
+		return;
 	}
 
-	void Scene::AddPointLight(GameObject* object, Vector3 color)
+	PointLight* light = new PointLight(color);
+	light->gameObject = object;
+	MonoBehaviour* component = (MonoBehaviour*)light;
+
+	object->components.push_back(component);
+	Renderer::currentPointLights.push_back((PointLight*)component);
+}
+
+void Scene::AddDirLight(GameObject* object, Vector3 color)
+{
+	if (Renderer::currentDirectionalLights.size() >= MAX_DIR_LIGHTS)
 	{
-		if (Renderer::currentPointLights.size() >= MAX_POINT_LIGHTS)
-		{
-			DEBUG_LOG("Max lights number (%i) reached. New light not added.", MAX_POINT_LIGHTS);
-			return;
-		}
-
-		PointLight* light = new PointLight(color);
-		light->gameObject = object;
-		MonoBehaviour* component = (MonoBehaviour*)light;
-
-		object->components.push_back(component);
-		Renderer::currentPointLights.push_back((PointLight*)component);
+		DEBUG_LOG("Max lights number (%i) reached. New light not added.", MAX_DIR_LIGHTS);
+		return;
 	}
 
-	void Scene::AddDirLight(GameObject* object, Vector3 color)
+	DirectionalLight* light = new DirectionalLight(color);
+	light->gameObject = object;
+	MonoBehaviour* component = (MonoBehaviour*)light;
+
+	object->components.push_back(component);
+	Renderer::currentDirectionalLights.push_back((DirectionalLight*)component);
+}
+
+void Scene::AddSpotLight(GameObject* object, float angle, Vector3 color)
+{
+	if (Renderer::currentSpotLights.size() >= MAX_SPOT_LIGHTS)
 	{
-		if (Renderer::currentDirectionalLights.size() >= MAX_DIR_LIGHTS)
-		{
-			DEBUG_LOG("Max lights number (%i) reached. New light not added.", MAX_DIR_LIGHTS);
-			return;
-		}
-
-		DirectionalLight* light = new DirectionalLight(color);
-		light->gameObject = object;
-		MonoBehaviour* component = (MonoBehaviour*)light;
-
-		object->components.push_back(component);
-		Renderer::currentDirectionalLights.push_back((DirectionalLight*)component);
+		DEBUG_LOG("Max lights number (%i) reached. New light not added.", MAX_SPOT_LIGHTS);
+		return;
 	}
 
-	void Scene::AddSpotLight(GameObject* object, float angle, Vector3 color)
-	{
-		if (Renderer::currentSpotLights.size() >= MAX_SPOT_LIGHTS)
-		{
-			DEBUG_LOG("Max lights number (%i) reached. New light not added.", MAX_SPOT_LIGHTS);
-			return;
-		}
+	SpotLight* light = new SpotLight(color);
+	light->gameObject = object;
+	light->angle = angle;
+	MonoBehaviour* component = (MonoBehaviour*)light;
 
-		SpotLight* light = new SpotLight(color);
-		light->gameObject = object;
-		light->angle = angle;
-		MonoBehaviour* component = (MonoBehaviour*)light;
+	object->components.push_back(component);
+	Renderer::currentSpotLights.push_back((SpotLight*)component);
+}
 
-		object->components.push_back(component);
-		Renderer::currentSpotLights.push_back((SpotLight*)component);
+void Scene::AddCamera(GameObject* object)
+{
+	//if (gameCamera != nullptr)
+	//{
+	//	DEBUG_LOG("Max camera number 1 reached. New Camera not added.");
+	//	return;
+	//}
+	newcam = true;
+	Camera* newCamera = new Camera();
+	newCamera->gameObject = object;
+	newCamera->Init(AppState::windowWidth, AppState::windowHeight);
+	MonoBehaviour* component = (MonoBehaviour*)newCamera;
+
+	object->components.push_back(component);
+	gameCamera = (Camera*)component;
+}
+
+template <class T>
+void Scene::AddCollider(GameObject* object, PxMaterial& material, Vector3 center, Vector3 size, bool trigger, bool isStatic)
+{
+	PxPhysics* physics = mPhysXManager.getPhysics();
+	PxScene* scene = mPhysXManager.getScene();
+	Matrix4 worldModel = object->GetWorldModel();
+	if (worldModel.matrix[0][2] == 0 || worldModel.matrix[1][1] == 0 || worldModel.matrix[2][0] == 0){
+	printf("Zero\n");
 	}
-
-	void Scene::AddCamera(GameObject* object)
-	{
-		//if (gameCamera != nullptr)
-		//{
-		//	DEBUG_LOG("Max camera number 1 reached. New Camera not added.");
-		//	return;
-		//}
-		newcam = true;
-		Camera* newCamera = new Camera();
-		newCamera->gameObject = object;
-		newCamera->Init(AppState::windowWidth, AppState::windowHeight);
-		MonoBehaviour* component = (MonoBehaviour*)newCamera;
-
-		object->components.push_back(component);
-		gameCamera = (Camera*)component;
-	}
-
-	template <class T>
-	void Scene::AddCollider(GameObject* object, PxMaterial& material, Vector3 center, Vector3 size, bool trigger, bool isStatic)
-	{
-		PxPhysics* physics = mPhysXManager.getPhysics();
-		PxScene* scene = mPhysXManager.getScene();
 		if (typeid(T) == typeid(BoxCollider))
 		{
 			T* collider = new T();
@@ -1074,7 +1078,7 @@ namespace Resources {
 			box->size = size;
 			box->isTrigger = trigger;
 			object->GetComponent<Rigidbody>()->isStatic = isStatic;
-			box->geometry = PxBoxGeometry(object->transform.scale.x * size.x*0.5f, object->transform.scale.y * size.y * 0.5f, object->transform.scale.z * size.z * 0.5f);
+			box->geometry = PxBoxGeometry(abs(worldModel.matrix[0][0]) * size.x*0.5f, abs(worldModel.matrix[1][1]) * size.y * 0.5f, abs(worldModel.matrix[2][2]) * size.z * 0.5f);
 			box->Init(*physics,material,*scene);
 			MonoBehaviour* component = (MonoBehaviour*)box;
 			object->components.push_back(component);
@@ -1087,7 +1091,7 @@ namespace Resources {
 			sphere->gameObject = object;
 			sphere->center = center;
 			sphere->radius = size.x;
-			sphere->geometry = PxSphereGeometry(object->transform.scale.x * size.x);
+			sphere->geometry = PxSphereGeometry(abs(worldModel.matrix[0][0]) * size.x);
 			sphere->isTrigger = trigger;
 			object->GetComponent<Rigidbody>()->isStatic = isStatic;
 			sphere->Init(*physics, material,*scene);
@@ -1106,7 +1110,7 @@ namespace Resources {
 			capsule->height = size.y;
 			capsule->isTrigger = trigger;
 			object->GetComponent<Rigidbody>()->isStatic = isStatic;
-			capsule->geometry = PxCapsuleGeometry(object->transform.scale.x * size.x, object->transform.scale.y * size.y * 0.5f);
+			capsule->geometry = PxCapsuleGeometry(abs(worldModel.matrix[0][0]) * size.x, abs(worldModel.matrix[1][1]) * size.y * 0.5f);
 			capsule->Init(*physics, material,*scene);
 			MonoBehaviour* component = (MonoBehaviour*)capsule;
 			object->components.push_back(component);

@@ -17,7 +17,20 @@ PxFilterFlags CustomFilterShader(PxFilterObjectAttributes attributes0, PxFilterD
     PxFilterObjectAttributes attributes1, PxFilterData filterData1,
     PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
 {
-    pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+    bool isTrigger0 = PxFilterObjectIsTrigger(attributes0);
+    bool isTrigger1 = PxFilterObjectIsTrigger(attributes1);
+    if (isTrigger0 || isTrigger1)
+    {
+        pairFlags = PxPairFlag::eDETECT_DISCRETE_CONTACT|PxPairFlag::eDETECT_CCD_CONTACT;
+        if (isTrigger0 && isTrigger1)
+        {
+            return PxFilterFlag::eSUPPRESS;
+        }
+    }
+    else
+    {
+        pairFlags = PxPairFlag::eCONTACT_DEFAULT;
+    }
     pairFlags |= PxPairFlag::eNOTIFY_TOUCH_FOUND;
     pairFlags |= PxPairFlag::eNOTIFY_TOUCH_LOST;
     return PxFilterFlag::eDEFAULT;
