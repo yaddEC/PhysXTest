@@ -52,7 +52,7 @@ bool PlayerMovements::UpdateComponent(std::string* id)
 void Game::PlayerMovements::ResetPos()
 {
 	glfwSetCursorPos(Input::window, AppState::windowWidth / 2.0f, AppState::windowHeight / 2.0f);
-	gameObject->GetComponent<Rigidbody>()->PhysxActor->setGlobalPose(PxTransform(0, 0,0));
+	gameObject->GetComponent<SphereCollider>()->PhysxActor->setGlobalPose(PxTransform(0, 0,0));
 	gameObject->transform = Transform(Vector3(), Vector3(0, 90, 0));
 	rb->velocity = Vector3();
 }
@@ -95,7 +95,7 @@ void PlayerMovements::UpdateMovements()
 	if (Input::GetButtonDown(Input::Button::RIGHT))
 		direction -= forward.CrossProduct(Up).Normalize();
 
-	float speed = moveSpeed*35;
+	float speed = moveSpeed*15;
 	if (grounded)
 	{
 		speed *= 2;

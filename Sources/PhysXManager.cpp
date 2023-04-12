@@ -26,6 +26,11 @@ PxFilterFlags CustomFilterShader(PxFilterObjectAttributes attributes0, PxFilterD
         {
             return PxFilterFlag::eSUPPRESS;
         }
+        else
+        {
+            pairFlags = PxPairFlag::eTRIGGER_DEFAULT;
+
+        }
     }
     else
     {
@@ -43,20 +48,18 @@ void MySimulationEventCallback::onContact(const PxContactPairHeader& pairHeader,
     {
         const PxContactPair& cp = pairs[i];
 
-        printf("STAY COLLISION\n");
+        //printf("STAY COLLISION\n");
 
         // only interested in contacts found with the shapes of the collider
         if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
         {
-            printf("ENTER COLLISION\n");
-
+            printf("\n");
         }
 
         // only interested in contacts lost with the shapes of the collider
         if (cp.events & PxPairFlag::eNOTIFY_TOUCH_LOST)
         {
-            printf("EXIT COLLISION\n");
-
+            printf("\n");
         }
 
 
@@ -87,7 +90,7 @@ void MySimulationEventCallback::onTrigger(PxTriggerPair* pairs, PxU32 count)
         }
   
 
-        printf("STAY TRIGGER\n");
+       //printf("STAY TRIGGER\n");
 
     }
 
@@ -209,7 +212,6 @@ void PhysXManager::CreateScene()
     sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
     sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
     sceneDesc.filterShader = CustomFilterShader;
-    sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
     sceneDesc.flags |= PxSceneFlag::eENABLE_PCM;
     sceneDesc.simulationEventCallback = mySimulationEventCallback;
     printf("PxSceneDesc settings:\n");

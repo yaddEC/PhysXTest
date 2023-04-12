@@ -13,25 +13,29 @@ void Physics::Collider::Init(PxPhysics& physics, PxMaterial& material, PxScene& 
 	
 	PxTransform pose(positionPointer);
 
-	if (rb->isStatic) {
-		rb->PhysxActor = physics.createRigidStatic(pose);
+	if (rigidbody) {
+		PhysxActor = physics.createRigidDynamic(pose);
+		PhysxActor->is<PxRigidDynamic>()->setMass(rb->mass);
+		rb->PhysxActor = PhysxActor;
 	}
 	else {
-		rb->PhysxActor = physics.createRigidDynamic(pose);
-		rb->PhysxActor->is<PxRigidDynamic>()->setMass(rb->mass);
+		PhysxActor = physics.createRigidStatic(pose);
 	}
 	setShape(material);
 
-	scene.addActor(*rb->PhysxActor);
+	scene.addActor(*PhysxActor);
+
 }
 
 void Physics::Collider::Update()
 {
-	
-	/*Matrix4 worldModel = gameObject->GetWorldModel();
-	PxVec3 position(worldModel.matrix[0][3] + center.x, worldModel.matrix[1][3] + center.y, worldModel.matrix[2][3] + center.z);
-	PxTransform pose(position);
-	rb->PhysxActor->setGlobalPose(pose);*/
+	if (!rb)
+	{
+		Matrix4 worldModel = gameObject->GetWorldModel();
+		PxVec3 position(worldModel.matrix[0][3] + center.x, worldModel.matrix[1][3] + center.y, worldModel.matrix[2][3] + center.z);
+		PxTransform pose(position);
+		PhysxActor->setGlobalPose(pose);
+	}
 }
 
 void Physics::Collider::Delete()
@@ -72,12 +76,18 @@ void Physics::BoxCollider::ShowCollider(int program)
 
 void Physics::BoxCollider::setShape(PxMaterial& material)
 {
-	shape = PxRigidActorExt::createExclusiveShape(*rb->PhysxActor, geometry, material);
-
+	shape = PxRigidActorExt::createExclusiveShape(*PhysxActor, geometry, material);
+	PxFilterData filterData;
+	filterData.word0 = 1;
+	filterData.word1 = PxPairFlag::eNOTIFY_TOUCH_FOUND | PxPairFlag::eNOTIFY_TOUCH_LOST;
 	
-
+	if (!rb)
+	{
+		shape->setSimulationFilterData(filterData);
+	}
 	if (isTrigger)
 	{
+		shape->setSimulationFilterData(filterData);
 		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
 		shape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
 	}
@@ -103,6 +113,10 @@ bool Physics::BoxCollider::UpdateComponent(std::string* id)
 		ImGui::DragFloat3(("##center" + *id).c_str(), &center.x, 0.1, -100, 100);
 		ImGui::Text("\Size");
 		ImGui::DragFloat3(("##size" + *id).c_str(), &size.x, 0.01, 0.01, 100);
+		Matrix4 printModel = gameObject->GetWorldModel();
+		ImGui::Text("\World Matrix\n");
+		ImGui::Text("\%f %f %f %f\n%f %f %f %f \n%f %f %f %f \n%f %f %f %f\n ", printModel.matrix[0][0], printModel.matrix[0][1], printModel.matrix[0][2], printModel.matrix[0][3], printModel.matrix[1][0], printModel.matrix[1][1], printModel.matrix[1][2], printModel.matrix[1][3],
+			printModel.matrix[2][0], printModel.matrix[2][1], printModel.matrix[2][2], printModel.matrix[2][3], printModel.matrix[3][0], printModel.matrix[3][1], printModel.matrix[3][2], printModel.matrix[3][3]);
 	}
 	return popUp;
 }
@@ -167,7 +181,7 @@ void Physics::SphereCollider::ShowCollider(int program)
 
 void Physics::SphereCollider::setShape(PxMaterial& material)
 {
-	shape = PxRigidActorExt::createExclusiveShape(*rb->PhysxActor, geometry, material);
+	shape = PxRigidActorExt::createExclusiveShape(*PhysxActor, geometry, material);
 	if (isTrigger)
 	{
 		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
@@ -196,6 +210,12 @@ bool Physics::SphereCollider::UpdateComponent(std::string* id)
 		ImGui::DragFloat3(("##center" + *id).c_str(), &center.x, 0.1, -100, 100);
 		ImGui::Text("\nRadius");
 		ImGui::DragFloat(("##radius" + *id).c_str(), &radius, 0.01, 0.001, 100);
+		Matrix4 printModel = gameObject->GetWorldModel();
+		ImGui::Text("\World Matrix\n");
+		ImGui::Text("\%f %f %f %f\n%f %f %f %f \n%f %f %f %f \n%f %f %f %f\n ", printModel.matrix[0][0], printModel.matrix[0][1], printModel.matrix[0][2], printModel.matrix[0][3], printModel.matrix[1][0], printModel.matrix[1][1], printModel.matrix[1][2], printModel.matrix[1][3],
+			printModel.matrix[2][0], printModel.matrix[2][1], printModel.matrix[2][2], printModel.matrix[2][3], printModel.matrix[3][0], printModel.matrix[3][1], printModel.matrix[3][2], printModel.matrix[3][3]);
+
+
 	}
 	return popUp;
 }
@@ -263,7 +283,7 @@ void Physics::CapsuleCollider::ShowCollider(int program)
 
 void Physics::CapsuleCollider::setShape(PxMaterial& material)
 {
-	shape = PxRigidActorExt::createExclusiveShape(*rb->PhysxActor, geometry, material);
+	shape = PxRigidActorExt::createExclusiveShape(*PhysxActor, geometry, material);
 	if (isTrigger)
 	{
 		shape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);

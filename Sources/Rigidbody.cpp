@@ -27,10 +27,10 @@ void Physics::Rigidbody::Update()
 	if (AppState::sceneMode == AppState::Mode::EDITOR)
 		return;
 
-	if (PhysxActor )
+	if (PhysxActor)
 	{
 		// Get the updated PxTransform from the PhysX simulation
-		
+
 		
 
 		if (!isStatic && PhysxActor && PhysxActor->is<PxRigidDynamic>())

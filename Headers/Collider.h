@@ -24,6 +24,7 @@ namespace Physics
 		Vector3 center;
 		Rigidbody* rb;
 		PxShape* shape;
+		PxRigidActor* PhysxActor;
 
 		void Init(PxPhysics& physics, PxMaterial& material, PxScene& scene);
 
